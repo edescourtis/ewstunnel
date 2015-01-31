@@ -37,7 +37,7 @@ start(_StartType, _StartArgs) ->
     lager:info("⚜ ewstunnel started"),
     Dispatch = cowboy_router:compile([
         {'_', [
-            {"/", ws_handler, []}
+            {'_', ws_handler, []}
         ]}
     ]),
     {ok, _} = cowboy:start_http(

@@ -74,8 +74,7 @@ send(Pid, Binary) when is_pid(Pid), is_binary(Binary) ->
     {ok, State :: #state{}} | {ok, State :: #state{}, timeout() | hibernate} |
     {stop, Reason :: term()} | ignore).
 init([WebSocketPid, Address, Port, LogDisconnectCallback]) ->
-    %%process_flag(trap_exit, true),
-    {ok, TcpSocket} = gen_tcp:connect(
+    TcpSocket = case gen_tcp:connect(
         unicode:characters_to_list(Address),
         Port,
         [
@@ -86,7 +85,12 @@ init([WebSocketPid, Address, Port, LogDisconnectCallback]) ->
             {nodelay,              true}
         ],
         ?CONNECT_TIMEOUT
-    ),
+    ) of
+        {ok, TSocket} -> TSocket;
+        {error, Reason} ->
+            LogDisconnectCallback(Reason),
+            exit({error, Reason})
+    end,
     WebSocketPid ! connected,
     MonitorRef = erlang:monitor(process, WebSocketPid),
     case erlang:is_process_alive(WebSocketPid) of
@@ -154,20 +158,25 @@ handle_info({tcp, TcpSocket, Data}, State = #state{tcp_socket = TcpSocket, webso
 handle_info({tcp_passive, TcpSocket}, State = #state{tcp_socket = TcpSocket}) ->
     ok = inet:setopts(TcpSocket, [{active, ?PACKET_BACKLOG}]),
     {noreply, State};
-handle_info({tcp_closed, TcpSocket}, State = #state{
+handle_info({Reason = tcp_closed, TcpSocket}, State = #state{
     tcp_socket = TcpSocket, websocket_pid = WSP, log_disconnect_cb = LDCB
 }) ->
     WSP ! disconnected,
-    LDCB(),
+    LDCB(Reason),
     {stop, normal, State};
 handle_info({'DOWN', MonitorRef, _Type, _Object, _Info}, State = #state{
     monitor_ref = MonitorRef,
     log_disconnect_cb = LDCB
 }) ->
-    LDCB(),
+    LDCB(websocket_closed),
     {stop, normal, State};
 handle_info(die, State = #state{log_disconnect_cb = LDCB}) ->
-    LDCB(),
+    LDCB(websocket_closed),
+    {stop, normal, State};
+handle_info({tcp_error, TcpSocket, Reason}, State = #state{
+    tcp_socket = TcpSocket, log_disconnect_cb = LDCB
+}) ->
+    LDCB(Reason),
     {stop, normal, State};
 handle_info(Info, State) ->
     lager:info("Unexpected message: ~p", [Info]),
