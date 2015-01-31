@@ -1,0 +1,14 @@
+{application, ewstunnel, [
+    {description, "Establish a TCP socket tunnel over web socket connection, for circumventing strict firewalls."},
+    {vsn, git},
+    {registered, []},
+    {applications, [
+        kernel,
+        stdlib,
+        sasl,
+        ranch,
+        lager
+    ]},
+    {mod, { ewstunnel_app, []}},
+    {env, []}
+]}.

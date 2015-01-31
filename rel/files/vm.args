@@ -1,0 +1,38 @@
+## Name of the node
+## -name ewstunnel@127.0.0.1
+-sname ewstunnel
+
+## Cookie for distributed erlang
+-setcookie S8EQX1fSc87a7do3za8rE5WI2pCULF
+
+## Heartbeat management; auto-restarts VM if it dies or becomes unresponsive
+## (Disabled by default..use with caution!)
+-heart
+
+## Enable kernel poll and a few async threads
++K true
++A 10
+
+## Disable compensation for sudden changes of system time.
++c
+
+## Sets the range of characters that the system will consider printable in
+## heuristic detection of strings. This typically affects the shell, debugger
+## and io:format functions (when ~tp is used in the format string).
++pc unicode
+
+## Sets the maximum number of simultaneously existing processes for
+## this system if a Number is passed as value. Valid range for Number
+## is [1024-134217727]
++P 1000000
+
+## Sets the maximum number of simultaneously existing ports for this
+## system if a Number is passed as value. Valid range for Number is
+## [1024-134217727]
++Q 65536
+
+## Increase number of concurrent ports/sockets
+## -env ERL_MAX_PORTS 32768
+
+## Tweak GC to run more often
+##-env ERL_FULLSWEEP_AFTER 10
