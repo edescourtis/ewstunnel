@@ -168,16 +168,19 @@ valid_host1(HostSetting, Host) when is_list(HostSetting), is_list(Host) ->
 valid_host1(_, _) ->
     false.
 
-valid_host2(StartIpN, EndIpN, Host) ->
+valid_host2(_StartIpN, _EndIpN, Host) ->
     case inet:gethostbyname(Host) of
-        {ok, {hostent, _, _, _, _, IPs}} ->
-            lists:all(
-                fun(H) ->
-                    HN = ip_tuple_to_integer(H),
-                    (HN >= StartIpN) and (HN =< EndIpN)
-                end,
-                IPs
-            );
+        {ok, {hostent, _, _, _, _, _IPs}} ->
+%% WARNING: Security risk domain could return new IP addresses
+%%          Feature disabled use hostname regex validation instead
+%           lists:all(
+%               fun(H) ->
+%                   HN = ip_tuple_to_integer(H),
+%                   (HN >= StartIpN) and (HN =< EndIpN)
+%               end,
+%               IPs
+%           );
+            false;
         {error, _Reason} ->
             false
     end.
@@ -190,8 +193,8 @@ valid_host_range(StartIpN, EndIpN)
 valid_host_range(_, _) ->
     false.
 
-ip_tuple_to_integer({A, B, C, D}) ->
-    (256 * 256 * 256 * A) + (256 * 256 * B) + (256 * C) + D.
+%ip_tuple_to_integer({A, B, C, D}) ->
+%    (256 * 256 * 256 * A) + (256 * 256 * B) + (256 * C) + D.
 
 ip_str_to_integer(IPStr) when is_list(IPStr) ->
     case inet:gethostbyname(IPStr) of
