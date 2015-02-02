@@ -65,7 +65,7 @@ start(_StartType, _StartArgs) ->
     {ok, _} = cowboy:start_http(
         http,
         100,
-        [{port, 8888}],
+        application:get_env(ewstunnel, ranch_tcp_settings, [{port, 8080}]),
         [{env, [
             {dispatch, Dispatch}
         ]}]
