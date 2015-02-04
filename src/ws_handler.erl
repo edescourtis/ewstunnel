@@ -168,11 +168,12 @@ valid_host1(HostSetting, Host) when is_list(HostSetting), is_list(Host) ->
 valid_host1(_, _) ->
     false.
 
-valid_host2(_StartIpN, _EndIpN, Host) ->
-    case inet:gethostbyname(Host) of
-        {ok, {hostent, _, _, _, _, _IPs}} ->
+valid_host2(_StartIpN, _EndIpN, _Host) ->
+    false.
 %% WARNING: Security risk domain could return new IP addresses
 %%          Feature disabled use hostname regex validation instead
+%   case inet:gethostbyname(Host) of
+%       {ok, {hostent, _, _, _, _, _IPs}} ->
 %           lists:all(
 %               fun(H) ->
 %                   HN = ip_tuple_to_integer(H),
@@ -180,10 +181,10 @@ valid_host2(_StartIpN, _EndIpN, Host) ->
 %               end,
 %               IPs
 %           );
-            false;
-        {error, _Reason} ->
-            false
-    end.
+%            false;
+%       {error, _Reason} ->
+%           false
+%    end.
 
 valid_host_range(StartIpN, EndIpN) 
     when StartIpN =< EndIpN,

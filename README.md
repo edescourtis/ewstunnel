@@ -14,7 +14,7 @@ Compilation
 Configuring
 =============
 <pre>
-vim rel/ewstunnel/releases/1.0.3/sys.config # You can change the ACL here and port
+vim rel/ewstunnel/releases/1.0.4/sys.config # You can change the ACL here and port
 </pre>
 
 IMPORTANT: By default we only accept forwarding to localhost:22
